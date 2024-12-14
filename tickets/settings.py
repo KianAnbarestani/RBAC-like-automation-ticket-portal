@@ -3,9 +3,18 @@
 import os
 import socket
 from pathlib import Path
-
+import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+env = environ.Env(
+    DEBUG=(bool, False)  # Set DEBUG to False by default
+)
+
+# Read .env file
+environ.Env.read_env(os.path.join(Path(__file__).resolve().parent.parent.parent, '.env'))
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # For development purposes, a default key is provided.
@@ -16,19 +25,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', ')tbz@z2px&&9@+l6$8o$*z8m2&%az1
 # For development, DJANGO_PRODUCTION_DOMAIN can be set to your local domain
 PRODUCTION_DOMAIN = os.environ.get("DJANGO_PRODUCTION_DOMAIN", "mysite.local")
 
-if socket.gethostname() == PRODUCTION_DOMAIN:
-    # Production-specific settings
-    DEBUG = False
-    TEMPLATE_DEBUG = False  # Deprecated in newer Django versions; consider removing if using Django >= 1.8
-    ALLOWED_HOSTS = ['mysite.local', 'your_production_domain.com']  # Replace with your production domain
-    # SSL/HTTPS settings
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-else:
+
     # Development-specific settings
-    DEBUG = True
-    TEMPLATE_DEBUG = True  # Deprecated in newer Django versions; consider removing if using Django >= 1.8
-    ALLOWED_HOSTS = ['mysite.local', 'localhost', '127.0.0.1']
+DEBUG = True
+TEMPLATE_DEBUG = True  # Deprecated in newer Django versions; consider removing if using Django >= 1.8
+ALLOWED_HOSTS = ['mysite.local', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'main',
 ]
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Template configuration
 # Updated to use the TEMPLATES setting instead of TEMPLATE_CONTEXT_PROCESSORS
@@ -83,12 +87,26 @@ WSGI_APPLICATION = 'tickets.wsgi.application'
 
 # Database
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',  # Or your preferred DB engine
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Or your preferred DB engine
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env('DATABASE_NAME', default='ticketing'),
+        "USER": env('DATABASE_USER', default='postgres'),
+        "PASSWORD": env('DATABASE_PASSWORD', default='1234'),
+        "HOST": env('DATABASE_HOST', default='localhost'),
+        "PORT": env('DATABASE_PORT', default='5432'),
     }
 }
+
+
 
 # Internationalization
 

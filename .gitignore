@@ -23,6 +23,7 @@ db.sqlite3
 
 # bash script to set environment variables
 env.sh
+venv/
 
 # static root folder for local deployments
 static_root
