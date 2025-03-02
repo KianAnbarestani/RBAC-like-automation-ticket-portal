@@ -74,6 +74,7 @@ class Ticket(models.Model):
     def __str__(self):
         return f'Ticket #{self.id}: {self.title}'
 
+
 class FollowUp(models.Model):
     """
     A FollowUp is a comment or update related to a specific ticket.
