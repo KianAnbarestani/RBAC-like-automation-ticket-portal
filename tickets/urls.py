@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 import main.views
 
+
 urlpatterns = [
     # Authentication URLs
     path('', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),

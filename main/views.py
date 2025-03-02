@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.core.mail import send_mail
@@ -27,7 +26,15 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+def is_admin_or_call_center(user):
+    return user.groups.filter(name__in=["Admin", "Call Center"]).exists()
+
+def is_normal_user(user):
+    return user.groups.filter(name="Users").exists()
+
+
 @login_required
+@user_passes_test(is_admin_or_call_center, login_url="forbidden", redirect_field_name=None)
 def inbox_view(request):
     """
     Display tickets that are assigned and unassigned.
@@ -75,6 +82,7 @@ def my_tickets_view(request):
 
 
 @login_required
+@user_passes_test(is_admin_or_call_center, login_url="forbidden", redirect_field_name=None)
 def all_tickets_view(request):
     """
     Display all open tickets excluding those with status "DONE".
@@ -132,6 +140,7 @@ def usersettings_update_view(request):
 
 
 @login_required
+@user_passes_test(is_admin_or_call_center, login_url="forbidden", redirect_field_name=None)
 @transaction.atomic
 def ticket_create_view(request):
     """
@@ -155,6 +164,7 @@ def ticket_create_view(request):
 
 
 @login_required
+@user_passes_test(is_admin_or_call_center, login_url="forbidden", redirect_field_name=None)
 @transaction.atomic
 def ticket_edit_view(request, pk):
     """

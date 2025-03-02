@@ -1,16 +1,28 @@
-# -*- coding: utf-8 -*-
-
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.conf import settings
 import os
 import logging
+from django.contrib.auth.models import Group, Permission
+
 
 logger = logging.getLogger(__name__)
 
 # Retrieve the User model. This approach supports custom user models.
 User = get_user_model()
+
+def create_groups():
+    # Create groups
+    admin_group, _ = Group.objects.get_or_create(name='Admin')
+    call_center_group, _ = Group.objects.get_or_create(name='Call Center')
+    user_group, _ = Group.objects.get_or_create(name='Users')
+
+    # Assign permissions to groups
+    admin_permissions = Permission.objects.filter(content_type__app_label='main')
+    admin_group.permissions.set(admin_permissions)
+    call_center_group.permissions.set(admin_permissions)  # Call Center gets the same permissions
+    user_group.permissions.clear()
 
 
 class Ticket(models.Model):
